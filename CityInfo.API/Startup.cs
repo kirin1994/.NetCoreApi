@@ -51,12 +51,13 @@ namespace CityInfo.API
 #else
             services.AddTransient<IMailService, CloudlMailService>();
 #endif
-            var connectionString = @"Server=(localdb)\mssqllocaldb;Database=CityInfoDB;Trusted_Connection=True;";
+            var connectionString = Startup.Configuration["connectionStrings:cityInfoDBconnectionString"];
             services.AddDbContext<CityInfoContext>(o => o.UseSqlServer(connectionString));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, 
+            CityInfoContext cityInfoContext)
         {
             loggerFactory.AddConsole();
             loggerFactory.AddDebug();
@@ -70,7 +71,7 @@ namespace CityInfo.API
             {
                 app.UseExceptionHandler();
             }
-
+            cityInfoContext.EnsureSeedDataForContext();
             app.UseMvc();
 
             //app.Run(async (context) =>
